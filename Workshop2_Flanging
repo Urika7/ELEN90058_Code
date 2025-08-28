@@ -1,0 +1,62 @@
+#include "SPWS2.h"
+
+#define PI 3.14159265359
+#define SAMPLE_RATE	8000
+
+
+#define BUFFER_LENGTH 80 // 8000Hz * 10ms
+#define ALPHA 0.7
+#define FSR 1.0
+
+static float delayBuffer[BUFFER_LENGTH+1];
+static int n = 0;
+static unsigned long sampledCount = 0;
+
+// Input samples
+float LeftInput;
+float RightInput;
+
+// Output samples
+float LeftOutput;
+float RightOutput;
+
+// Declare any global variables you need
+
+
+
+void Flanging(void)
+{
+
+int d = floor(0.5 * BUFFER_LENGTH * (1.0-cosf(2*PI*FSR*sampledCount/SAMPLE_RATE)));
+
+
+	int n_delayed = n - d;
+	if (n_delayed < 0)
+		n_delayed += (BUFFER_LENGTH+1);
+
+	LeftOutput = LeftInput + ALPHA*delayBuffer[n];//Apply Filter
+
+    delayBuffer[n_delayed] = LeftInput;//Assign next input into buffer
+
+    //Increase index
+    n++;
+    sampledCount++;
+
+    //If reached end of buffer size, start writing over buffer
+    if(n_delayed > BUFFER_LENGTH){
+    	n_delayed = 0;
+    }
+
+}
+
+void Chorusing(void)
+{
+	// TODO: Implement Chorusing
+	LeftOutput = LeftInput;
+}
+
+void Phasing(void)
+{
+	// TODO: Implement Phasing
+	LeftOutput = LeftInput;
+}
